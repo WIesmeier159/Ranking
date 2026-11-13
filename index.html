@@ -24,6 +24,8 @@
   button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   button.danger:hover { border-color: #dc2626; color: #dc2626; }
   .ipadsync { margin: 16px auto 0; max-width: 560px; background: #ecfdf5; border: 1px solid #86efac; border-radius: 10px; padding: 10px; display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .ipadsync.old { background: #fef3c7; border-color: #f59e0b; }
+  .ipadsync small { width: 100%; text-align: center; color: var(--muted); font-size: 12px; }
   .sync { background: #374151; border-radius: 6px; padding: 8px; font-size: 13px; display: flex; flex-direction: column; gap: 5px; }
   .sync.ok { background: #14532d; color: #dcfce7; }
   .sync.warn { background: #78350f; color: #fef3c7; }
@@ -599,8 +601,11 @@ function classStartHtml(c, cur) {
       ? "Es erscheint der <b>Sitzplan</b> im Vollbild. Schüler antippen → Beteiligung und Tiefe antippen → das Feld schließt von selbst. Nur eine Kategorie? Einfach daneben tippen."
       : "Noch kein Sitzplan angelegt – es erscheint die <b>alphabetische Liste</b>. Den Sitzplan legst du im Reiter „🪑 Sitzplan“ an."}
       <br>Eine andere Stunde? Oben bei „Bewertung für:“ auswählen oder „+ Stunde nachtragen“.</p>
-    ${canFolderSync ? "" : `<div class="ipadsync"><b>ByCS-Sync:</b> vor dem Unterricht <button data-sync="get">⬇️ Sync holen</button>
-      danach <button data-sync="send">⬆️ Sync senden</button></div>`}
+    ${canFolderSync ? "" : (() => { const h = hoursSinceGet(), old = h === null || h >= 12;
+      return `<div class="ipadsync${old ? " old" : ""}"><b>ByCS-Sync:</b> ${old ? "⚠️ Neuesten Stand holen:" : "vor dem Unterricht"}
+      <button data-sync="get"${old ? ' class="primary"' : ""}>⬇️ Sync holen</button>
+      danach <button data-sync="send">⬆️ Sync senden</button>
+      <small>${h === null ? "Noch nie geholt" : `Zuletzt geholt vor ${h < 1 ? "weniger als 1" : Math.floor(h)} Std.`} · „✕ Beenden“ öffnet das Senden automatisch</small></div>`; })()}
     <p class="hint">Hinweis ⏳ „lange nicht bewertet“ ab
       <button class="sm" data-thr="-">−</button> <b>${staleAfter(c)}</b> <button class="sm" data-thr="+">+</button> Stunden ohne Bewertung (Fehltage zählen nicht).</p></div>`;
 }
@@ -660,7 +665,11 @@ $("focus").addEventListener("click", e => {
   const t = e.target;
   if (t.id === "fExit") {
     focusMode = false; focusFilter = false; render();
-    if (!canFolderSync) toast("Unterricht beendet – jetzt „⬆️ Sync senden“ tippen, damit die Bewertungen in ByCS landen.");
+    // iPad: Teilen-Menü direkt öffnen (muss im selben Fingertipp passieren) → Kurzbefehl „Ranking → ByCS“ oder „In Dateien sichern“
+    if (!canFolderSync) shareOrDownload(syncPayload(), SYNCFILE, "application/json").then(ok => {
+      if (ok) { state.lastBackup = new Date().toISOString(); saveNow(); renderSidebar(); }
+      else toast("Nicht gesendet – später „⬆️ Sync senden“ tippen.", true);
+    });
     else if (syncActive) syncNow();
     return;
   }
@@ -1705,12 +1714,23 @@ document.addEventListener("click", async e => {
 });
 $("fileSync").addEventListener("change", async e => {
   const f = e.target.files[0]; if (!f) return;
-  try { snapshot(); applyRemote(JSON.parse(await f.text())); render(); toast("Sync geholt – Stände zusammengeführt."); }
+  try {
+    snapshot(); applyRemote(JSON.parse(await f.text()));
+    try { localStorage.setItem("rankingTool.lastGet", String(Date.now())); } catch (e2) {}
+    render(); toast("Sync geholt – Stände zusammengeführt.");
+  }
   catch (err) { toast("Das ist keine gültige Sync-Datei.", true); }
 });
+// iPad: wie lange ist der letzte „Sync holen“ her? (pro Gerät)
+function hoursSinceGet() {
+  let t = null; try { t = Number(localStorage.getItem("rankingTool.lastGet")) || null; } catch (e) {}
+  return t ? (Date.now() - t) / 3600000 : null;
+}
 
 render();
 initSync();
+// iPad beim Start: Hinweis, wenn der Stand älter als 12 Stunden ist
+if (!canFolderSync) { const h = hoursSinceGet(); if (h === null || h >= 12) setTimeout(() => toast("⬇️ Tipp: Erst „Sync holen“ – der Stand auf diesem Gerät ist älter als 12 Std."), 800); }
 </script>
 </body>
 </html>
