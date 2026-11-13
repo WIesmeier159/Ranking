@@ -1,0 +1,16 @@
+{
+  "name": "Ranking-Tool",
+  "short_name": "Ranking",
+  "description": "Schüler ranken und Beteiligung/Tiefe pro Stunde bewerten – offline, Daten bleiben auf dem Gerät.",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f5f7",
+  "theme_color": "#1f2937",
+  "icons": [
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
