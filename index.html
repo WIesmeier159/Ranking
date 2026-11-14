@@ -249,6 +249,7 @@
   .fboard { text-align: center; background: #374151; color: #fff; border-radius: 6px; font-size: 12px; letter-spacing: 2px; padding: 2px; margin: 0 20%; }
   .fgrid { flex: 1; min-height: 0; display: grid; gap: 8px; }
   .fseat { border: 2px dashed #e5e7eb; border-radius: 16px; display: flex; min-width: 0; min-height: 0; }
+  .fseat.free { border: none; }
   .ftile { flex: 1; min-width: 0; background: #fff; border: 2px solid var(--line); border-radius: 16px; display: flex; flex-direction: column;
            align-items: center; justify-content: center; gap: 3px; padding: 4px; cursor: pointer; overflow: hidden; user-select: none; }
   .ftile:active { transform: scale(.97); }
@@ -277,7 +278,7 @@
   .ftile { padding-bottom: 20px; }
   .ftile .pwrgrp { position: absolute; bottom: 3px; left: 5px; }
   .ftile .failgrp { position: absolute; bottom: 3px; right: 5px; }
-  .ftile .pwrinc, .ftile .pwrdec, .ftile .failinc, .ftile .faildec { padding: 2px 6px; font-size: 12px; border-radius: 10px; }
+  .ftile .pwrinc, .ftile .pwrdec, .ftile .failinc, .ftile .faildec { padding: 5px 9px; font-size: 16px; border-radius: 10px; }
   .ftile .melcount, .ftile .meldec { padding: 1px 5px; font-size: 11px; border-radius: 10px; }
   .ftile .fn { font-weight: 600; font-size: clamp(12px, 1.5vw, 19px); text-align: center; line-height: 1.15; overflow: hidden; }
   .ftile .fb { font-size: clamp(11px, 1.2vw, 15px); color: var(--muted); display: flex; gap: 8px; }
@@ -842,10 +843,11 @@ function renderFocus() {
   };
   let body;
   if (Object.keys(at).length) {
-    // Nur belegte Plätze zeigen (leere Plätze einfach weglassen, Kacheln fließen kompakt zusammen)
+    // Alle Plätze an ihrer echten Position zeigen (auch leere, als Lücke) – sonst verschiebt sich die
+    // Anordnung gegenüber dem echten Sitzplan, sobald irgendwo ein Platz frei ist.
     let cells = "";
     for (let r = 0; r < S.rows; r++) for (let k = 0; k < S.cols; k++) {
-      const s = at[r + "-" + k]; if (s) cells += `<div class="fseat">${tile(s)}</div>`;
+      const s = at[r + "-" + k]; cells += s ? `<div class="fseat">${tile(s)}</div>` : `<div class="fseat free"></div>`;
     }
     body = `<div class="fgrid" style="grid-template-columns: repeat(${S.cols}, minmax(0, 1fr))">${cells}</div>
       <div class="fboard">TAFEL / PULT</div>

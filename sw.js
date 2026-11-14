@@ -1,7 +1,7 @@
 ﻿// Offline-Speicher für die Web-App (iPad).
 // Speichert NUR die Programmdateien. Schülerdaten liegen im Gerätespeicher und werden nie übertragen.
 // Bei einer neuen Version des Tools: Zahl in CACHE erhöhen (z. B. ranking-v2), dann lädt das iPad sie beim nächsten Start.
-const CACHE = "ranking-v9";
+const CACHE = "ranking-v11";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-512.png", "./emg_logo.gif"];
 
 self.addEventListener("install", e => {
