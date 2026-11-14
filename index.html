@@ -15,11 +15,13 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Ranking-Tool</title>
 <style>
-  :root { --bg:#f4f5f7; --panel:#fff; --line:#d9dce1; --text:#1d2330; --muted:#6b7280; --accent:#2563eb; --red:#fde2e2; --yellow:#fff4cc; --green:#dcf5e3; }
+  /* EMG-Farben: Hauptakzent aus dem EMG-Grün (#72B635/#1C9A3C im Logo), warme Neutraltöne statt kühlem Grau,
+     leichtes EMG-Blau (#00B1EB im Logo) als zweite, zurückhaltende Akzentfarbe (Logo-Chip, aktiver Kurs). */
+  :root { --bg:#FAF6EC; --panel:#fff; --line:#d9dce1; --text:#1d2330; --muted:#6b7280; --accent:#6B9A1C; --accent-light:#CFE6A6; --blue:#00A8DB; --blue-bg:#BEE9F7; --blue-text:#0E3A4A; --red:#fde2e2; --yellow:#fff4cc; --green:#dcf5e3; }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body { display: flex; font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; color: var(--text); background: var(--bg); }
-  button, .btn { font: inherit; padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; background: #fff; cursor: pointer; display: inline-block; }
+  button, .btn { font: inherit; padding: 6px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; cursor: pointer; display: inline-block; }
   button:hover, .btn:hover { border-color: var(--accent); }
   button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   button.danger:hover { border-color: #dc2626; color: #dc2626; }
@@ -34,24 +36,26 @@
   .sync button.lnk { background: none; border: 0; padding: 0; text-decoration: underline; font-size: 11px; color: inherit; opacity: .8; }
   .delcourse { margin-left: auto; font-size: 13px; padding: 4px 10px; color: var(--muted); background: transparent; border-color: transparent; }
   .delcourse:hover { color: #dc2626; border-color: #dc2626; background: #fff; }
-  aside { width: 230px; flex-shrink: 0; background: #1f2937; color: #e5e7eb; padding: 16px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+  aside { width: 230px; flex-shrink: 0; background: #332E1C; color: #e5e7eb; padding: 16px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+  .emglogo { display: flex; justify-content: center; padding: 8px; background: var(--blue-bg); border: 1px solid var(--blue); border-radius: 12px; margin-bottom: 4px; }
+  .emglogo img { height: 32px; display: block; }
   aside h2 { margin: 0 0 4px; font-size: 16px; color: #fff; }
   aside ul { list-style: none; margin: 0; padding: 0; }
-  aside li { padding: 8px 10px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; gap: 6px; }
-  aside li:hover { background: #374151; }
-  aside li.active { background: var(--accent); color: #fff; }
+  aside li { padding: 8px 10px; border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; gap: 6px; }
+  aside li:hover { background: #463F27; }
+  aside li.active { background: var(--blue-bg); color: var(--blue-text); border: 1px solid var(--blue); }
   aside li .count { opacity: .7; font-size: 13px; }
-  aside button, aside .btn { width: 100%; text-align: left; background: #374151; color: #e5e7eb; border-color: #4b5563; }
-  aside hr { border: 0; border-top: 1px solid #4b5563; width: 100%; margin: 8px 0; }
-  aside .small { font-size: 12px; color: #9ca3af; margin: 0; }
-  main { flex: 1; overflow: auto; padding: 20px 24px 60px; }
+  aside button, aside .btn { width: 100%; text-align: left; background: #463F27; color: #e5e7eb; border-color: #584F31; }
+  aside hr { border: 0; border-top: 1px solid #584F31; width: 100%; margin: 8px 0; }
+  aside .small { font-size: 12px; color: #c9c2ab; margin: 0; }
+  main { flex: 1; overflow: auto; padding: 16px 20px 32px; }
   .head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
   .head input { font-size: 22px; font-weight: 600; border: 1px solid transparent; background: transparent; padding: 4px 6px; border-radius: 6px; min-width: 280px; }
   .head input:hover, .head input:focus { border-color: var(--line); background: #fff; }
   .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
   .toolbar select { font: inherit; padding: 6px; border-radius: 6px; border: 1px solid var(--line); }
   .hint { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
-  table { border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  table { border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
   th, td { border-bottom: 1px solid var(--line); padding: 2px 6px; text-align: left; vertical-align: middle; }
   th { background: #eef0f3; position: sticky; top: 0; z-index: 1; font-weight: 600; font-size: 13px; }
   th.colhead { white-space: nowrap; }
@@ -81,6 +85,8 @@
   tbody tr:hover td { background: #f8fafc; }
   tr.dragging td { background: #bfdbfe !important; box-shadow: inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
   th.ratehead { text-align: center; white-space: nowrap; }
+  th.sortable { cursor: pointer; }
+  th.sortable:hover { color: var(--accent); background: var(--accent-light); }
   td.rate { white-space: nowrap; text-align: center; }
   .lv { font: inherit; font-size: 14px; font-weight: 700; letter-spacing: 1px; min-width: 32px; height: 34px; padding: 0 3px; margin: 0 1px;
         border: 1px solid var(--line); border-radius: 6px; background: #fff; color: #9ca3af; cursor: pointer; touch-action: manipulation; }
@@ -92,7 +98,7 @@
   td.rate + td.rate, th.rateday + th.rateday { border-left: 2px solid var(--line); }
   td.rate, th.rateday { background: #f0fdf4; }
   th small { font-weight: 400; color: var(--muted); }
-  .lessonbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 10px; padding: 8px 10px; background: #fff; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
+  .lessonbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 10px; padding: 8px 10px; background: #fff; border: 1px solid var(--line); border-radius: 12px; font-size: 14px; }
   .lessonbar select { font: inherit; padding: 5px; border-radius: 6px; border: 1px solid var(--line); }
   .lessonbar .sep { width: 1px; height: 26px; background: var(--line); margin: 0 6px; }
   .wd { padding: 4px 9px; }
@@ -103,10 +109,14 @@
   td.ravg.neg b { color: #dc2626; }
   td.ravg.neu b { color: #6b7280; }
   .ov tbody tr { cursor: default; user-select: text; }
-  .ov td { padding: 6px 8px; }
+  .ov td { padding: 6px 4px; }
+  .ov th.ratehead { padding: 6px 3px; font-size: 16px; }
   .ovh { cursor: pointer; text-align: center; white-space: nowrap; }
   .ovh:hover { color: var(--accent); }
   .ovc { text-align: center; white-space: nowrap; }
+  .spark { width: 54px; height: 16px; color: var(--accent); vertical-align: middle; margin-left: 4px; }
+  .cropwrap { width: 280px; height: 280px; border-radius: 50%; overflow: hidden; margin: 10px auto; border: 2px solid var(--line); }
+  #cropCanvas { touch-action: none; cursor: grab; display: block; }
   .ovc .p { color: #16a34a; font-weight: 700; }
   .ovc .n { color: #dc2626; font-weight: 700; }
   .ovc .dim { color: #cbd5e1; }
@@ -122,7 +132,7 @@
   #banner { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); background: var(--accent); color: #fff; padding: 10px 18px; border-radius: 8px; pointer-events: none; display: none; z-index: 10; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
   #toast { position: fixed; right: 16px; bottom: 16px; background: #111827; color: #fff; padding: 10px 16px; border-radius: 8px; display: none; max-width: 420px; z-index: 10; }
   #toast.err { background: #b91c1c; }
-  dialog { border: 1px solid var(--line); border-radius: 10px; padding: 18px; width: 440px; }
+  dialog { border: 1px solid var(--line); border-radius: 16px; padding: 18px; width: 440px; }
   dialog textarea { width: 100%; height: 260px; font: inherit; }
   dialog .row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
   button, .btn, .lv { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
@@ -137,12 +147,60 @@
   .remind button { margin-top: 6px; width: 100%; background: #f59e0b; color: #fff; border-color: #f59e0b; font-weight: 600; }
 
   /* Unterrichtsmodus */
-  .nolesson { background: #fff; border: 1px dashed var(--line); border-radius: 8px; padding: 16px; color: var(--muted); }
+  .nolesson { background: #fff; border: 1px dashed var(--line); border-radius: 12px; padding: 16px; color: var(--muted); }
   .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 10px; }
-  .card { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; position: relative; }
+  .card .pwrgrp { position: absolute; top: 6px; right: 6px; }
+  .card .failgrp { position: absolute; bottom: 6px; right: 6px; }
   .card.rated { border-color: #86efac; }
   .cname { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; margin-bottom: 6px; }
   .cname img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+  /* Avatar (Design A): generisches Kopf-Symbol, bei Foto automatisch ersetzt */
+  .av { border-radius: 50%; flex-shrink: 0; }
+  span.av { display: inline-flex; align-items: center; justify-content: center; background: var(--accent); color: #fff; width: 30px; height: 30px; font-size: 16px; }
+  span.av.sm { width: 26px; height: 26px; font-size: 14px; }
+  img.av { width: 30px; height: 30px; object-fit: cover; }
+  img.av.sm { width: 26px; height: 26px; }
+  .pwrgrp { display: inline-flex; align-items: center; gap: 2px; }
+  .pwrinc, .pwrdec { border: 1px solid var(--line); background: #fff; color: #9ca3af; border-radius: 8px; padding: 4px 8px; font-size: 14px; cursor: pointer; line-height: 1; }
+  .pwrinc:hover, .pwrdec:hover { border-color: #f59e0b; color: #f59e0b; }
+  .pwrinc.on { background: #fffbeb; border-color: #f59e0b; color: #b45309; font-weight: 700; }
+  .pwrdec { font-size: 11px; padding: 4px 6px; min-width: 20px; text-align: center; }
+  .pwrinc.big { width: 100%; text-align: center; font-size: 15px; padding: 8px; }
+  .pwrdec.sm { font-size: 12px; padding: 6px 10px; white-space: nowrap; }
+  .failgrp { display: inline-flex; align-items: center; gap: 2px; }
+  .failinc, .faildec { border: 1px solid var(--line); background: #fff; color: #9ca3af; border-radius: 8px; padding: 4px 8px; font-size: 14px; cursor: pointer; line-height: 1; }
+  .failinc:hover, .faildec:hover { border-color: #dc2626; color: #dc2626; }
+  .failinc.on { background: #fef2f2; border-color: #dc2626; color: #b91c1c; font-weight: 700; }
+  .faildec { font-size: 11px; padding: 4px 6px; min-width: 20px; text-align: center; }
+  .failinc.big { width: 100%; text-align: center; font-size: 15px; padding: 8px; }
+  .faildec.sm { font-size: 12px; padding: 6px 10px; white-space: nowrap; }
+  .melgrp { display: inline-flex; align-items: center; gap: 2px; }
+  .melcount { font-size: 12px; color: var(--muted); padding: 2px 4px; }
+  .melinc, .meldec { border: 1px solid var(--line); background: #fff; color: #9ca3af; border-radius: 8px; padding: 4px 8px; font-size: 14px; cursor: pointer; line-height: 1; }
+  .melinc:hover, .meldec:hover { border-color: var(--accent); color: var(--accent); }
+  .melinc.on { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .meldec { font-size: 11px; padding: 4px 6px; min-width: 20px; text-align: center; }
+  .melinc.big { width: 100%; text-align: center; font-size: 15px; padding: 8px; }
+  .meldec.sm { font-size: 12px; padding: 6px 10px; white-space: nowrap; }
+  /* Ampel für die inhaltliche Rückmeldung: grün/orange/leicht rot, niederschwellig antippbar */
+  .amprow { align-items: center; }
+  .ampgrp { display: inline-flex; gap: 6px; }
+  .ampdot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line); background: #fff; cursor: pointer; padding: 0; }
+  .ampdot.amp-dg { border-color: #15803d; } .ampdot.amp-dg.on { background: #15803d; }
+  .ampdot.amp-g { border-color: #4ade80; } .ampdot.amp-g.on { background: #4ade80; }
+  .ampdot.amp-o { border-color: #f59e0b; } .ampdot.amp-o.on { background: #f59e0b; }
+  .ampdot.amp-r { border-color: #f29b9b; } .ampdot.amp-r.on { background: #f29b9b; }
+  .ampdot.amp-dr { border-color: #dc2626; } .ampdot.amp-dr.on { background: #dc2626; }
+  .catdots { display: inline-flex; gap: 3px; vertical-align: middle; }
+  .catdot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; background: var(--line); }
+  .catdot.amp-dg { background: #15803d; } .catdot.amp-g { background: #4ade80; } .catdot.amp-o { background: #f59e0b; } .catdot.amp-r { background: #f29b9b; } .catdot.amp-dr { background: #dc2626; } .catdot.amp-dim { background: #e5e7eb; }
+  .ravg.amp-dg { color: #166534; } .ravg.amp-g { color: #166534; } .ravg.amp-o { color: #92400e; } .ravg.amp-r { color: #b2555a; } .ravg.amp-dr { color: #991b1b; } .ravg.amp-dim { color: var(--muted); }
+  .ratebtn { width: 100%; text-align: center; font-weight: 600; }
+  .notebtn { border: 0; background: none; padding: 0 2px; cursor: pointer; font-size: 13px; opacity: .3; vertical-align: middle; }
+  .notebtn.has, .notebtn:hover { opacity: 1; }
+  @keyframes pwrpop { 0% { transform: scale(1); } 35% { transform: scale(1.08); } 100% { transform: scale(1); } }
+  .pwrpop { animation: pwrpop .35s ease; box-shadow: 0 0 0 3px #fde68a; }
   .cavg { margin-left: auto; font-weight: 400; font-size: 12px; color: var(--muted); white-space: nowrap; }
   .crow { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
   .clabel { width: 82px; font-size: 13px; color: var(--muted); flex-shrink: 0; }
@@ -157,9 +215,9 @@
   .seatbar .sm { padding: 4px 10px; }
   .board { text-align: center; background: #374151; color: #fff; border-radius: 6px; padding: 4px; margin: 0 auto 10px; max-width: 60%; font-size: 13px; letter-spacing: 2px; }
   .seats { display: grid; gap: 8px; }
-  .seat { min-height: 74px; border: 2px dashed #e5e7eb; border-radius: 10px; display: flex; }
+  .seat { min-height: 66px; border: 2px dashed #e5e7eb; border-radius: 14px; display: flex; }
   .seat.free.editing { border-color: #cbd5e1; background: #f8fafc; cursor: pointer; }
-  .tile { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; gap: 4px; user-select: none; }
+  .tile { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 6px 8px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; gap: 4px; user-select: none; }
   .tile .tn { font-weight: 600; font-size: 14px; line-height: 1.2; }
   .tile .tb { font-size: 13px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
   .tile .tb b.p { color: #16a34a; } .tile .tb b.n { color: #dc2626; }
@@ -175,7 +233,7 @@
   #dlgRate .clabel { width: 110px; font-size: 16px; font-weight: 600; color: var(--text); }
   #dlgRate .rate.big .lv { height: 66px; font-size: 21px; border-radius: 10px; }
   #dlgRate::backdrop { background: rgba(17, 24, 39, .45); }
-  .tile .tph { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; float: left; margin-right: 6px; }
+  .tile .av { float: left; margin-right: 6px; }
 
   /* Unterrichtsmodus: Start-Knopf + Vollbild-Sitzplan */
   .startbox { text-align: center; padding: 30px 10px; }
@@ -190,8 +248,8 @@
   .fhead #fExit { margin-left: auto; }
   .fboard { text-align: center; background: #374151; color: #fff; border-radius: 6px; font-size: 12px; letter-spacing: 2px; padding: 2px; margin: 0 20%; }
   .fgrid { flex: 1; min-height: 0; display: grid; gap: 8px; }
-  .fseat { border: 2px dashed #e5e7eb; border-radius: 12px; display: flex; min-width: 0; min-height: 0; }
-  .ftile { flex: 1; min-width: 0; background: #fff; border: 2px solid var(--line); border-radius: 12px; display: flex; flex-direction: column;
+  .fseat { border: 2px dashed #e5e7eb; border-radius: 16px; display: flex; min-width: 0; min-height: 0; }
+  .ftile { flex: 1; min-width: 0; background: #fff; border: 2px solid var(--line); border-radius: 16px; display: flex; flex-direction: column;
            align-items: center; justify-content: center; gap: 3px; padding: 4px; cursor: pointer; overflow: hidden; user-select: none; }
   .ftile:active { transform: scale(.97); }
   .ftile { position: relative; }
@@ -202,7 +260,7 @@
   .ftile.f3 .fb b.p, .ftile.f4 .fb b.p { color: #fff; } .ftile.f3 .fb b.n, .ftile.f4 .fb b.n { color: #fde68a; }
   .ftile.today { box-shadow: inset 0 0 0 4px #14532d; }
   .fcheck { position: absolute; top: 4px; left: 6px; background: #14532d; color: #fff; border-radius: 10px; font-size: 12px; font-weight: 700; padding: 1px 7px; }
-  .fcnt { position: absolute; bottom: 3px; right: 7px; font-size: 11px; color: var(--muted); }
+  .fcnt { position: absolute; bottom: 20px; right: 7px; font-size: 11px; color: var(--muted); }
   .ftile.stale { border: 3px dashed #f59e0b; }
   .fstale { position: absolute; top: 4px; right: 6px; background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; border-radius: 10px; font-size: 12px; font-weight: 600; padding: 1px 7px; }
   .ftile.absent { background: #f3f4f6 !important; border: 2px dotted #cbd5e1; box-shadow: none; }
@@ -215,7 +273,12 @@
   .absbtn { font: inherit; font-size: 16px; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: #6b7280; }
   .absbtn.on { background: #6b7280; color: #fff; border-color: #6b7280; }
   .card.absent { opacity: .55; }
-  .ftile img { width: min(60px, 42%); aspect-ratio: 1; border-radius: 50%; object-fit: cover; flex-shrink: 1; min-height: 0; }
+  .ftile img.av, .ftile span.av { width: min(60px, 42%); height: auto; aspect-ratio: 1; font-size: clamp(16px, 3vw, 26px); flex-shrink: 1; min-height: 0; }
+  .ftile { padding-bottom: 20px; }
+  .ftile .pwrgrp { position: absolute; bottom: 3px; left: 5px; }
+  .ftile .failgrp { position: absolute; bottom: 3px; right: 5px; }
+  .ftile .pwrinc, .ftile .pwrdec, .ftile .failinc, .ftile .faildec { padding: 2px 6px; font-size: 12px; border-radius: 10px; }
+  .ftile .melcount, .ftile .meldec { padding: 1px 5px; font-size: 11px; border-radius: 10px; }
   .ftile .fn { font-weight: 600; font-size: clamp(12px, 1.5vw, 19px); text-align: center; line-height: 1.15; overflow: hidden; }
   .ftile .fb { font-size: clamp(11px, 1.2vw, 15px); color: var(--muted); display: flex; gap: 8px; }
   .ftile .fb b.p { color: #16a34a; } .ftile .fb b.n { color: #dc2626; }
@@ -231,7 +294,7 @@
   @media (max-width: 1000px) {
     body { flex-direction: column; }
     aside { width: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 8px 10px; gap: 6px; overflow: visible; }
-    aside h2, aside hr, aside .small { display: none; }
+    aside h2, aside hr, aside .small, .emglogo { display: none; }
     aside ul { display: flex; flex-wrap: wrap; gap: 4px; }
     aside button, aside .btn { width: auto; }
     .remind { display: flex; gap: 8px; align-items: center; }
@@ -250,6 +313,7 @@
 <body>
 
 <aside>
+  <div class="emglogo"><img src="emg_logo.gif" alt="EMG Haar" title="Ernst-Mach-Gymnasium Haar"></div>
   <h2>Kurse</h2>
   <ul id="courseList"></ul>
   <button id="btnNewCourse">+ Neuer Kurs</button>
@@ -284,6 +348,17 @@
   <h3 id="rateName"></h3>
   <div id="rateBody"></div>
   <div class="row"><button id="rateClose" class="primary">Fertig</button></div>
+</dialog>
+
+<dialog id="dlgCrop">
+  <h3 style="margin-top:0">Foto zuschneiden</h3>
+  <p class="hint">Ziehen = verschieben, Regler = zoomen. Nur der Kreis wird als Foto gespeichert – so kannst du aus einem Gruppenfoto immer das passende Gesicht ausschneiden.</p>
+  <div class="cropwrap"><canvas id="cropCanvas" width="280" height="280"></canvas></div>
+  <input type="range" id="cropZoom" min="100" max="400" value="100" style="width:100%">
+  <div class="row">
+    <button id="cropCancel">Abbrechen</button>
+    <button id="cropOk" class="primary">✓ Übernehmen</button>
+  </div>
 </dialog>
 
 <dialog id="dlgImport">
@@ -366,11 +441,19 @@ function avg(c, s) {
   return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
 }
 function fmt(n) { return n === null ? "" : n.toFixed(1).replace(".", ","); }
-/* ---------- Stunden-Bewertungen (Beteiligung / Inhaltliche Tiefe) ----------
+/* ---------- Stunden-Bewertungen ----------
    Kurs:    weekdays: [1..6] (Mo=1 … Sa=6), lessons: [{id, date:"JJJJ-MM-TT"}], skip: [Daten, an denen die Auto-Stunde gelöscht wurde]
-   Schüler: lr: { <lessonId>: { b: Wert, t: Wert } }   Wert: +3 … +1, −1 … −3 (nicht angetippt = keine Bewertung) */
-const RATINGS = [{ key: "b", name: "Beteiligung" }, { key: "t", name: "Inhaltliche Tiefe" }];
-const LEVELS = [{ v: 3, l: "+++" }, { v: 2, l: "++" }, { v: 1, l: "+" }, { v: -1, l: "−" }, { v: -2, l: "−−" }, { v: -3, l: "−−−" }];
+   Schüler: lr: { <lessonId>: { m: Meldungen (0..∞, Antippen = Beteiligung), f: fehlt, p: Power-Antworten (0..5),
+                                 answers: [ { ts, ko?, ti?, tr?, da? } ] } }   // je Antwort ein Eintrag, Werte −1/0/+1 (Ampel)
+   Beteiligung = gezählte Meldungen. Inhaltliche Rückmeldung = pro Antwort bis zu 4 Ampel-Kategorien, erst je Stunde gemittelt,
+   dann die Stunden-Mittelwerte über den Kurs gemittelt (jede Stunde zählt gleich viel, unabhängig von der Anzahl Antworten). */
+const RATINGS = [
+  { key: "ko", name: "Korrektheit", icon: "✅" },
+  { key: "ti", name: "Tiefe & Begründung", icon: "🎯" },
+  { key: "tr", name: "Transfer & Anwendung", icon: "🔗" },
+  { key: "da", name: "Darstellung", icon: "📝" },
+];
+const AMPEL = [{ v: 2, c: "dg", l: "sehr gut" }, { v: 1, c: "g", l: "gut" }, { v: 0, c: "o", l: "mittel" }, { v: -1, c: "r", l: "schwach" }, { v: -2, c: "dr", l: "sehr schwach" }];
 const WD = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
 // Ansicht: "rank" = Ranking, "class" = Unterrichtsmodus, "seat" = Sitzplan, "overview" = Übersicht.
 // Wird pro Gerät gemerkt (nicht in der Sicherung). Touch-Geräte starten im Unterrichtsmodus.
@@ -381,9 +464,14 @@ function setView(v) { view = v; try { localStorage.setItem(UIKEY, JSON.stringify
 let seatPick = null;   // Sitzplan: angetippter Schüler, der als Nächstes platziert wird
 const lessonSel = {};       // pro Kurs manuell gewählte Stunde (nur solange das Fenster offen ist)
 
-function lvLabel(v) { const L = LEVELS.find(x => x.v === v); return L ? L.l : ""; }
-function avgSymbol(a) { return a >= 2.5 ? "+++" : a >= 1.5 ? "++" : a >= 0.5 ? "+" : a > -0.5 ? "o" : a > -1.5 ? "−" : a > -2.5 ? "−−" : "−−−"; }
-function fmtSigned(a) { return (a > 0 ? "+" : a < 0 ? "−" : "") + Math.abs(a).toFixed(1).replace(".", ","); }
+function ampelClass(a) {
+  if (a === null || a === undefined) return "dim";
+  return a > 1.33 ? "dg" : a > 0.33 ? "g" : a > -0.33 ? "o" : a > -1.33 ? "r" : "dr";
+}
+function ampelLabel(a) {
+  if (a === null || a === undefined) return "–";
+  return a > 1.33 ? "sehr gut" : a > 0.33 ? "gut" : a > -0.33 ? "mittel" : a > -1.33 ? "schwach" : "sehr schwach";
+}
 function localDate(d = new Date()) {
   return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 }
@@ -401,41 +489,92 @@ function ensureLessons(c) {
     save();
   }
 }
+// Letzter eingestellter Kurstag (vor heute, max. 14 Tage zurück), der weder erfasst noch übersprungen wurde.
+function missingLessonDate(c) {
+  if (!(c.weekdays || []).length) return null;
+  const today = new Date();
+  for (let i = 1; i <= 14; i++) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    if (!c.weekdays.includes(d.getDay())) continue;
+    const iso = localDate(d);
+    if (c.lessons.some(l => l.date === iso) || (c.skip || []).includes(iso)) continue;
+    return iso;
+  }
+  return null;
+}
 // Welche Stunde wird gerade bewertet? Standard: die heutige (falls vorhanden). Andere Tage = abgeschlossen.
 function currentLesson(c) {
   const sel = lessonSel[c.id];
   if (sel !== undefined) return c.lessons.find(l => l.id === sel) || null;
   return c.lessons.find(l => l.date === localDate()) || null;
 }
-function ratingAvg(c, s, key) {
-  const ids = new Set((c.lessons || []).map(l => l.id)); const v = [];
-  for (const [lid, r] of Object.entries(s.lr || {})) if (ids.has(lid) && typeof r[key] === "number") v.push(r[key]);
-  return v.length ? { a: v.reduce((x, y) => x + y, 0) / v.length, n: v.length } : null;
+// Antworten einer Stunde (Array, 0..n Einträge, je bis zu 4 Ampel-Kategorien).
+function answersOf(s, lessonId) { return ((s.lr || {})[lessonId] || {}).answers || []; }
+// Durchschnitt EINER Stunde für eine Kategorie (nur Antworten, bei denen diese Kategorie gesetzt wurde).
+function catLessonAvg(s, lessonId, key) {
+  const vals = answersOf(s, lessonId).map(a => a[key]).filter(v => typeof v === "number");
+  return vals.length ? vals.reduce((x, y) => x + y, 0) / vals.length : null;
+}
+// Kurs-Durchschnitt: erst je Stunde mitteln, dann die Stunden-Mittelwerte mitteln (jede Stunde zählt gleich viel).
+function catCourseAvg(c, s, key) {
+  const vals = [];
+  for (const l of c.lessons || []) { const a = catLessonAvg(s, l.id, key); if (a !== null) vals.push(a); }
+  return vals.length ? { a: vals.reduce((x, y) => x + y, 0) / vals.length, n: vals.length } : null;
+}
+function catDotRow(valsByKey) {
+  return `<span class="catdots">` + RATINGS.map(cat => {
+    const a = valsByKey[cat.key];
+    return `<i class="catdot amp-${ampelClass(a)}" title="${cat.icon} ${cat.name}: ${ampelLabel(a)}"></i>`;
+  }).join("") + `</span>`;
+}
+function catDotsLessonHtml(s, lessonId) {
+  const vals = {}; RATINGS.forEach(cat => vals[cat.key] = catLessonAvg(s, lessonId, cat.key));
+  return catDotRow(vals);
+}
+function catDotsCourseHtml(c, s) {
+  const vals = {}; RATINGS.forEach(cat => { const r = catCourseAvg(c, s, cat.key); vals[cat.key] = r ? r.a : null; });
+  return catDotRow(vals);
 }
 function ravgHtml(c, s, key) {
-  const r = ratingAvg(c, s, key);
+  const r = catCourseAvg(c, s, key);
   if (!r) return `<td class="ravg"><span>–</span></td>`;
-  const cls = r.a >= 0.5 ? "pos" : r.a <= -0.5 ? "neg" : "neu";
-  return `<td class="ravg ${cls}" title="Durchschnitt aus ${r.n} bewerteten Stunde(n)"><b>${avgSymbol(r.a)}</b> <span>(${fmtSigned(r.a)}) · ${r.n}×</span></td>`;
+  return `<td class="ravg amp-${ampelClass(r.a)}" title="Ø ${ampelLabel(r.a)} aus ${r.n} Stunde(n) mit Bewertung"><i class="catdot amp-${ampelClass(r.a)}"></i> <span>${r.n}×</span></td>`;
 }
-function rateCell(s, lessonId, r) {
-  const cur = ((s.lr || {})[lessonId] || {})[r.key];
-  return `<td class="rate" data-r="${r.key}">` + LEVELS.map(L =>
-    `<button class="lv ${L.v > 0 ? "pos" : "neg"}${cur === L.v ? " on" : ""}" data-v="${L.v}" title="${r.name}: ${L.l}">${L.l}</button>`
-  ).join("") + `</td>`;
-}
-function cellSym(v) { return typeof v !== "number" ? `<span class="dim">·</span>` : `<span class="${v > 0 ? "p" : "n"}">${lvLabel(v)}</span>`; }
+// Monatsrückblick: nur die Stunden des gewählten Kalendermonats (Standard: aktueller Monat).
+let monthOnly = false;
+function monthLessons(c, ym) { ym = ym || localDate().slice(0, 7); return (c.lessons || []).filter(l => l.date.startsWith(ym)); }
 function overviewHtml(c) {
   if (!c.lessons.length) return `<p class="empty">Noch keine Stunden. Lege oben die Kurstage fest oder trage eine Stunde nach.</p>`;
-  return `<table class="ov"><thead><tr><th>#</th><th>Name</th>
-    ${c.lessons.map(l => `<th class="ovh" data-lesson="${l.id}" title="Klicken, um diese Stunde zu bearbeiten">${dateLabel(l.date)}<br><small>Bet. / Tiefe</small></th>`).join("")}
-    ${RATINGS.map(r => `<th class="ratehead">Ø ${r.name}</th>`).join("")}<th class="ratehead">Bewertet</th><th class="ratehead">Gefehlt</th></tr></thead><tbody>
-    ${c.students.map((s, i) => `<tr><td class="rank">${i + 1}.</td><td class="ovname">${esc(s.name)}</td>
-      ${c.lessons.map(l => { const r = (s.lr || {})[l.id] || {};
-        return r.f ? `<td class="ovc"><span class="dim">fehlt</span></td>` : `<td class="ovc">${cellSym(r.b)} / ${cellSym(r.t)}</td>`; }).join("")}
-      ${RATINGS.map(r => ravgHtml(c, s, r.key)).join("")}
-      <td class="ovc">${ratedCount(c, s)}×</td><td class="ovc">${absentCount(c, s) || "–"}</td></tr>`).join("")}
+  const lessons = monthOnly ? monthLessons(c) : c.lessons;
+  const mc = { ...c, lessons };   // für Durchschnitte/Zähler: dieselben Funktionen, aber nur über die gefilterten Stunden
+  const monthLabel = new Date().toLocaleDateString("de-DE", { month: "long", year: "numeric" });
+  const toggle = `<div class="toolbar"><button id="btnMonthOnly" class="${monthOnly ? "primary" : ""}">📅 ${monthOnly ? "Alle Stunden zeigen" : "Nur " + monthLabel}</button></div>`;
+  if (!lessons.length) return toggle + `<p class="empty">Keine Stunden im ${monthLabel}.</p>`;
+  return toggle + `<table class="ov"><thead><tr><th>#</th><th class="ratehead sortable" data-sort="name" title="Klicken: nach Name sortieren, nochmal klicken dreht um">Name ${sortArrow("name")}</th><th class="ratehead" title="Verlauf: Meldungen je Stunde übers ganze Schuljahr">📈</th>
+    ${lessons.map(l => `<th class="ovh" data-lesson="${l.id}" title="Klicken, um diese Stunde zu bearbeiten">${dateLabel(l.date)}<br><small>Meld. / Kategorien</small></th>`).join("")}
+    <th class="ratehead sortable" data-sort="meld" title="Klicken: nach Ø Meldungen ranken, nochmal klicken dreht um">📣 ${sortArrow("meld")}</th>
+    ${RATINGS.map(r => `<th class="ratehead sortable" data-sort="r:${r.key}" title="${r.name} – Klicken: nach Ø ${r.name} ranken, nochmal klicken dreht um">${r.icon} ${sortArrow("r:" + r.key)}</th>`).join("")}
+    <th class="ratehead sortable" data-sort="absent" title="Gefehlt – Klicken: nach Fehlstunden ranken (zuerst wenigste), nochmal klicken dreht um">🚫 ${sortArrow("absent")}</th>
+    <th class="ratehead sortable" data-sort="power" title="Power-Antworten – Klicken: nach Power-Antworten ranken, nochmal klicken dreht um">⚡ ${sortArrow("power")}</th>
+    <th class="ratehead sortable" data-sort="fail" title="Fail-Antworten – Klicken: nach Fail-Antworten ranken, nochmal klicken dreht um">❌ ${sortArrow("fail")}</th></tr></thead><tbody>
+    ${c.students.map((s, i) => `<tr><td class="rank">${i + 1}.</td><td class="ovname">${esc(s.name)}</td><td class="ovc">${meldSparkline(c, s)}</td>
+      ${lessons.map(l => { const r = (s.lr || {})[l.id] || {};
+        return r.f ? `<td class="ovc"><span class="dim">fehlt</span></td>` : `<td class="ovc">${r.m ? `📣${r.m}` : `<span class="dim">·</span>`} ${catDotsLessonHtml(s, l.id)}${r.p ? ` ⚡${r.p}` : ""}${r.x ? ` ❌${r.x}` : ""}</td>`; }).join("")}
+      <td class="ovc">${ratedCount(mc, s) || "–"}</td>${RATINGS.map(r => ravgHtml(mc, s, r.key)).join("")}
+      <td class="ovc">${absentCount(mc, s) || "–"}</td><td class="ovc">${powerCount(mc, s) || "–"}</td><td class="ovc">${failCount(mc, s) || "–"}</td></tr>`).join("")}
     </tbody></table>`;
+}
+// Verlauf übers ganze Schuljahr (nicht nur den gefilterten Monat): Meldungen je Stunde als kleine Linie.
+function sparklineSvg(values, w = 54, h = 16) {
+  if (values.length < 2) return "";
+  const max = Math.max(1, ...values);
+  const step = w / (values.length - 1);
+  const pts = values.map((v, i) => `${(i * step).toFixed(1)},${(h - (v / max) * h).toFixed(1)}`).join(" ");
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>`;
+}
+function meldSparkline(c, s) {
+  const svg = sparklineSvg((c.lessons || []).map(l => meldungen(s, null, l.id)));
+  return svg ? `<span title="Verlauf: Meldungen je Stunde übers ganze Schuljahr (nicht nur der gefilterte Monat)">${svg}</span>` : "";
 }
 function scoreClass(v) { return typeof v !== "number" ? "" : v < 5 ? "low" : v < 10 ? "mid" : "high"; }
 function download(content, filename, type) {
@@ -503,7 +642,11 @@ function renderMain() {
         <option value="">Sortieren nach …</option>
         ${sortOpts}
         <option value="avg">Ø Durchschnitt (hoch → niedrig)</option>
+        <option value="meld">Ø Meldungen pro Stunde (hoch → niedrig)</option>
         ${RATINGS.map(r => `<option value="r:${r.key}">Ø ${r.name} (gut → schwach)</option>`).join("")}
+        <option value="power">⚡ Power-Antworten (meiste zuerst)</option>
+        <option value="fail">❌ Fail-Antworten (meiste zuerst)</option>
+        <option value="absent">Gefehlt (wenigste zuerst)</option>
         <option value="name">Name (A → Z)</option>
       </select>
       <button id="btnUndo" title="Strg+Z">↶ Rückgängig</button>
@@ -516,8 +659,9 @@ function renderMain() {
         <th>#</th><th></th><th>Foto</th><th>Name</th>
         ${c.columns.map(col => `<th class="colhead" data-col="${col.id}"><input class="colname" value="${esc(col.name)}" title="Spaltenname ändern"><button class="x delcol" title="Spalte löschen">✕</button></th>`).join("")}
         <th>Ø</th>
-        ${cur ? RATINGS.map(r => `<th class="ratehead rateday">${r.name}<br><small>${dateLabel(cur.date)}${cur.date === localDate() ? " – heute" : ""}</small></th>`).join("") : ""}
-        ${RATINGS.map(r => `<th class="ratehead" title="Durchschnitt aller Stunden">Ø ${r.key === "b" ? "Beteil." : "Tiefe"}</th>`).join("")}
+        ${cur ? `<th class="ratehead rateday">Meldung<br><small>${dateLabel(cur.date)}${cur.date === localDate() ? " – heute" : ""}</small></th>` : ""}
+        <th class="ratehead" title="Meldungen pro Stunde">Ø Meld./Std.</th>
+        ${RATINGS.map(r => `<th class="ratehead" title="Durchschnitt aller Stunden mit Bewertung">Ø ${r.icon}<br><small>${r.name}</small></th>`).join("")}
         <th></th>
       </tr></thead>
       <tbody id="tbody">
@@ -539,19 +683,63 @@ function noLessonHtml() {
   return `<div class="nolesson">Heute ist keine Stunde für diesen Kurs angelegt. Oben eine Stunde auswählen, die Kurstage festlegen
     oder <button id="btnToday" class="primary">Heutige Stunde anlegen</button></div>`;
 }
-function rateBox(s, lessonId, r, big) {
-  const cur = ((s.lr || {})[lessonId] || {})[r.key];
-  return `<div class="rate${big ? " big" : ""}" data-r="${r.key}">` + LEVELS.map(L =>
-    `<button class="lv ${L.v > 0 ? "pos" : "neg"}${cur === L.v ? " on" : ""}" data-v="${L.v}" title="${r.name}: ${L.l}">${L.l}</button>`
-  ).join("") + `</div>`;
+// Eine Ampel-Zeile im Bewertungsfenster: Kategorie-Name + 3 antippbare Punkte (gut/mittel/schwach).
+// `cur` ist der Wert der GERADE eingegebenen (noch nicht bestätigten) Antwort, nicht der Stunden-Durchschnitt.
+function ampelRowHtml(cat, cur) {
+  return `<div class="crow amprow"><span class="clabel">${cat.icon} ${cat.name}</span><span class="ampgrp" data-cat="${cat.key}">` +
+    AMPEL.map(a => `<button class="ampdot amp-${a.c}${cur === a.v ? " on" : ""}" data-v="${a.v}" title="${cat.name}: ${a.l}"></button>`).join("") +
+    `</span></div>`;
 }
-function symOf(c, s, key) { const r = ratingAvg(c, s, key); return r ? avgSymbol(r.a) : "–"; }
-function cavgHtml(c, s) { return `Ø Bet. <b>${symOf(c, s, "b")}</b> · Tiefe <b>${symOf(c, s, "t")}</b>`; }
-// lr[lessonId] = { b, t } Bewertung · { f: true } = fehlt (zählt nirgends mit)
-function isRated(s, l) { const r = l && s.lr && s.lr[l.id]; return !!(r && RATINGS.some(x => typeof r[x.key] === "number")); }
+function cavgHtml(c, s) { return `📣 <b>${ratedCount(c, s)}×</b> gesamt ${catDotsCourseHtml(c, s)}`; }
+// lr[lessonId] = { m: Meldungen, answers: [...] } · { f: true } = fehlt · { p: 0..5 } = Power-Antworten · { x: 0..5 } = Fail-Antworten dieser Stunde.
+function meldungen(s, l, lessonId) { return ((s.lr || {})[lessonId || (l && l.id)] || {}).m || 0; }
+function isRated(s, l) { const r = l && s.lr && s.lr[l.id]; return !!(r && ((r.m || 0) > 0 || (r.answers && r.answers.length))); }
 function isAbsent(s, l) { const r = l && s.lr && s.lr[l.id]; return !!(r && r.f); }
-function ratedCount(c, s) { return (c.lessons || []).filter(l => isRated(s, l)).length; }
+// „Wie oft insgesamt gemeldet“ (treibt die Grünskala und die „×“-Anzeige).
+function ratedCount(c, s, lessonId) {
+  if (lessonId) return meldungen(s, null, lessonId);
+  let n = 0; for (const l of c.lessons || []) n += meldungen(s, l); return n;
+}
+// Meldungen pro Stunde (Fehltage zählen nicht mit) – für Sortierung/Übersicht.
+function meldAvg(c, s) {
+  const lessons = (c.lessons || []).filter(l => !isAbsent(s, l));
+  return lessons.length ? ratedCount(c, s) / lessons.length : null;
+}
 function absentCount(c, s) { return (c.lessons || []).filter(l => isAbsent(s, l)).length; }
+function powerCount(c, s, lessonId) {
+  if (lessonId) return ((s.lr || {})[lessonId] || {}).p || 0;
+  let n = 0; for (const l of c.lessons || []) n += ((s.lr || {})[l.id] || {}).p || 0; return n;
+}
+// Fail-Antwort: Gegenstück zu Power (falsche/gescheiterte Antwort), gleiches Muster, eigenes Feld `x`.
+function failCount(c, s, lessonId) {
+  if (lessonId) return ((s.lr || {})[lessonId] || {}).x || 0;
+  let n = 0; for (const l of c.lessons || []) n += ((s.lr || {})[l.id] || {}).x || 0; return n;
+}
+// Meldungen-Anzeige: nur Zähler + Rücknahme (das Antippen der Kachel/Karte selbst zählt bereits als +1).
+function melHtml(s, lessonId) {
+  const m = meldungen(s, null, lessonId);
+  return `<span class="melgrp"><span class="melcount">📣 ${m}</span>${m ? `<button class="meldec" data-sid="${s.id}" title="Letzte Meldung zurücknehmen">↩</button>` : ""}</span>`;
+}
+// Meldungen-Zeile mit explizitem +/− (Ranking-Tabelle, Dialog) – dort gibt es keine Tipp-Geste, also eigener Knopf zum Hochzählen.
+function melCellHtml(s, lessonId, big) {
+  const m = meldungen(s, null, lessonId);
+  return `<span class="melgrp"><button class="melinc${big ? " big" : ""}${m ? " on" : ""}" data-sid="${s.id}" title="Meldung (+1)">📣${big ? " Meldung" : ""}${m ? ` ${m}` : ""}</button>${m ? `<button class="meldec${big ? " sm" : ""}" data-sid="${s.id}" title="Letzte Meldung zurücknehmen">↩</button>` : ""}</span>`;
+}
+// Schnellnotiz: einfacher Freitext je Schüler (kein Zeitstempel/Historie), z.B. "hat Buch vergessen".
+function noteBtnHtml(s) {
+  return `<button class="notebtn${s.note ? " has" : ""}" data-sid="${s.id}" title="${s.note ? esc(s.note) : "Schnellnotiz hinzufügen"}">📝</button>`;
+}
+function editNote(c, sid) {
+  const s = c.students.find(x => x.id === sid); if (!s) return;
+  const v = prompt("Schnellnotiz zu " + s.name + ":", s.note || "");
+  if (v === null) return;
+  snapshot();
+  const t = v.trim();
+  if (t) s.note = t; else delete s.note;
+  save(); render();
+}
+// Design A: generisches Kopf-Symbol, bei vorhandenem Foto wird es durch ein kleines Foto ersetzt.
+function avatarHtml(s, cls) { const c = `av${cls ? " " + cls : ""}`; return s.photo ? `<img class="${c}" src="${s.photo}" alt="">` : `<span class="${c}">👤</span>`; }
 // Wie viele frühere Stunden (ohne Fehltage) seit der letzten Bewertung? Heute bewertet = 0.
 function staleCount(c, s, cur) {
   if (isRated(s, cur)) return 0;
@@ -569,7 +757,9 @@ function toggleAbsent(c, sid) {
   snapshot(undefined, true);
   s.lr = s.lr || {}; s.lrt = s.lrt || {};
   const now = !isAbsent(s, l);
-  if (now) s.lr[l.id] = { f: true }; else delete s.lr[l.id];
+  const r = s.lr[l.id] = s.lr[l.id] || {};
+  if (now) r.f = true; else delete r.f;
+  if (!Object.keys(r).length) delete s.lr[l.id];
   s.lrt[l.id] = Date.now();
   save();
   return now;
@@ -580,25 +770,34 @@ function classHtml(c, cur) {
   if (!cur) return noLessonHtml();
   const list = [...c.students].sort((a, b) => a.name.localeCompare(b.name, "de"));
   const n = list.filter(s => isRated(s, cur)).length;
-  return `<p class="hint">Stunde <b>${dateLabel(cur.date)}</b>: nur antippen, wer auffällt. Nochmal tippen = zurücknehmen. Bisher bewertet: <b id="ratedCount">${n}</b> von ${list.length}.</p>
-    <div class="cards">${list.map(s => { const abs = isAbsent(s, cur), st = staleCount(c, s, cur), stale = !abs && st >= staleAfter(c);
+  return `<p class="hint">Stunde <b>${dateLabel(cur.date)}</b>: Karte antippen = Meldung (zählt in die Beteiligung). Nach oben ziehen = Inhaltliche Tiefe bewerten. Bisher aktiv: <b id="ratedCount">${n}</b> von ${list.length}.</p>
+    <div class="cards">${list.map(s => { const abs = isAbsent(s, cur), st = staleCount(c, s, cur), stale = !abs && st >= staleAfter(c), pn = powerCount(c, s, cur.id), xn = failCount(c, s, cur.id);
       return `<div class="card${isRated(s, cur) ? " rated" : ""}${abs ? " absent" : ""}" data-id="${s.id}"${stale ? ' style="border:3px dashed #f59e0b"' : ""}>
-      <div class="cname">${s.photo ? `<img src="${s.photo}" alt="">` : ""}${esc(s.name)}${stale ? ` <span class="fstale" style="position:static">⏳ ${st} Std.</span>` : ""}<span class="cavg">${cavgHtml(c, s)}</span></div>
-      ${RATINGS.map(r => `<div class="crow"><span class="clabel">${r.key === "b" ? "Beteiligung" : "Inhaltl. Tiefe"}</span>${rateBox(s, cur.id, r, true)}</div>`).join("")}
+      <span class="pwrgrp"><button class="pwrinc${pn ? " on" : ""}" data-sid="${s.id}" title="Power-Antwort (+1, bis 5× pro Stunde)">⚡</button>${pn ? `<button class="pwrdec" data-sid="${s.id}" title="Letzte Power-Antwort zurücknehmen">${pn}↩</button>` : ""}</span>
+      <span class="failgrp"><button class="failinc${xn ? " on" : ""}" data-sid="${s.id}" title="Fail-Antwort (+1, bis 5× pro Stunde)">❌</button>${xn ? `<button class="faildec" data-sid="${s.id}" title="Letzten Fail zurücknehmen">${xn}↩</button>` : ""}</span>
+      ${melHtml(s, cur.id)}
+      <div class="cname">${avatarHtml(s, "sm")}${esc(s.name)}${noteBtnHtml(s)}${stale ? ` <span class="fstale" style="position:static">⏳ ${st} Std.</span>` : ""}<span class="cavg">${cavgHtml(c, s)}</span></div>
+      <div class="crow">${catDotsLessonHtml(s, cur.id)}<span style="font-size:12px;color:var(--muted);margin-left:6px">${answersOf(s, cur.id).length}× heute bewertet</span></div>
+      <div class="crow"><button class="ratebtn" data-sid="${s.id}">🎯 Antwort bewerten</button></div>
       <div class="crow"><span class="clabel"></span><button class="absbtn${abs ? " on" : ""}" style="padding:6px 12px;font-size:14px">${abs ? "✓ Fehlt heute – zurücknehmen" : "Fehlt heute"}</button></div>
     </div>`; }).join("")}</div>`;
 }
 
 // Unterricht: Start-Knopf. Danach Vollbild (Sitzplan, oder alphabetische Liste, falls noch kein Sitzplan).
-let focusMode = false, autoCloseT = null, focusFilter = false;
+let focusMode = false, focusFilter = false;
+let pending = {};   // die gerade im Bewertungsfenster eingegebene (noch nicht bestätigte) Antwort
 function hasSeatPlan(c) { return Object.keys(seatInfo(c).at).length > 0; }
 function classStartHtml(c, cur) {
   const t = localDate();
   const label = cur ? dateLabel(cur.date) + (cur.date === t ? " (heute)" : "") : dateLabel(t) + " (heute)";
+  const missing = missingLessonDate(c);
   return `<div class="startbox">
+    ${missing ? `<div class="ipadsync old"><b>⚠️ ${dateLabel(missing)}</b> war laut Kurstagen Unterricht, aber keine Stunde erfasst.
+      <button data-missing="skip" data-date="${missing}">📅 Ferientag/Entfall</button>
+      <button data-missing="add" data-date="${missing}" class="primary">+ Jetzt nachtragen</button></div>` : ""}
     <button id="btnStart" class="startbtn">▶ Unterricht starten<br><small>Stunde ${label}</small></button>
     <p class="hint">${hasSeatPlan(c)
-      ? "Es erscheint der <b>Sitzplan</b> im Vollbild. Schüler antippen → Beteiligung und Tiefe antippen → das Feld schließt von selbst. Nur eine Kategorie? Einfach daneben tippen."
+      ? "Es erscheint der <b>Sitzplan</b> im Vollbild. Kachel <b>antippen</b> = Meldung (Beteiligung). Kachel <b>nach oben ziehen</b> = Inhaltliche Tiefe bewerten."
       : "Noch kein Sitzplan angelegt – es erscheint die <b>alphabetische Liste</b>. Den Sitzplan legst du im Reiter „🪑 Sitzplan“ an."}
       <br>Eine andere Stunde? Oben bei „Bewertung für:“ auswählen oder „+ Stunde nachtragen“.</p>
     ${canFolderSync ? "" : (() => { const h = hoursSinceGet(), old = h === null || h >= 12;
@@ -629,29 +828,31 @@ function renderFocus() {
   const nRated = c.students.filter(s => isRated(s, l)).length;
   const nAbs = c.students.filter(s => isAbsent(s, l)).length;
   const nStale = c.students.filter(isStale).length;
-  // Kachel: Hintergrund = wie oft insgesamt bewertet (Grünskala), ✓ = heute bewertet, ⏳ = lange nicht bewertet, grau = fehlt
+  // Kachel: Hintergrund = wie oft insgesamt bewertet (Grünskala), ✓ = heute bewertet, ⏳ = lange nicht bewertet, grau = fehlt, ⚡ = Power-Antworten
   const tile = s => {
-    const rr = (s.lr || {})[l.id] || {}, cnt = ratedCount(c, s), abs = isAbsent(s, l), today = isRated(s, l);
+    const cnt = ratedCount(c, s), abs = isAbsent(s, l), today = isRated(s, l), pn = powerCount(c, s, l.id), xn = failCount(c, s, l.id);
     const st = staleCount(c, s, l), stale = !abs && st >= thr;
     const cls = `ftile f${freqLevel(cnt)}${today ? " today" : ""}${abs ? " absent" : ""}${stale ? " stale" : ""}${focusFilter && !stale ? " dim" : ""}`;
     return `<div class="${cls}" data-sid="${s.id}">
+      <span class="pwrgrp"><button class="pwrinc${pn ? " on" : ""}" data-sid="${s.id}" title="Power-Antwort (+1, bis 5× pro Stunde)">⚡</button>${pn ? `<button class="pwrdec" data-sid="${s.id}" title="Letzte Power-Antwort zurücknehmen">${pn}↩</button>` : ""}</span>
+      <span class="failgrp"><button class="failinc${xn ? " on" : ""}" data-sid="${s.id}" title="Fail-Antwort (+1, bis 5× pro Stunde)">❌</button>${xn ? `<button class="faildec" data-sid="${s.id}" title="Letzten Fail zurücknehmen">${xn}↩</button>` : ""}</span>
       ${today ? `<span class="fcheck">✓</span>` : ""}${stale ? `<span class="fstale">⏳ ${st} Std.</span>` : ""}<span class="fcnt">${cnt}×</span>
-      ${s.photo ? `<img src="${s.photo}" alt="">` : ""}<div class="fn">${esc(s.name)}</div>
-      <div class="fb">${abs ? "<span>fehlt</span>" : badge(rr.b, "B") + badge(rr.t, "T")}</div></div>`;
+      ${avatarHtml(s)}<div class="fn">${esc(s.name)}</div>
+      <div class="fb">${abs ? "<span>fehlt</span>" : catDotsLessonHtml(s, l.id) + melHtml(s, l.id)}</div></div>`;
   };
   let body;
   if (Object.keys(at).length) {
+    // Nur belegte Plätze zeigen (leere Plätze einfach weglassen, Kacheln fließen kompakt zusammen)
     let cells = "";
     for (let r = 0; r < S.rows; r++) for (let k = 0; k < S.cols; k++) {
-      const s = at[r + "-" + k];
-      cells += s ? `<div class="fseat">${tile(s)}</div>` : `<div class="fseat"></div>`;
+      const s = at[r + "-" + k]; if (s) cells += `<div class="fseat">${tile(s)}</div>`;
     }
-    body = `<div class="fboard">TAFEL / PULT</div>
-      <div class="fgrid" style="grid-template-columns: repeat(${S.cols}, minmax(0, 1fr)); grid-template-rows: repeat(${S.rows}, minmax(0, 1fr))">${cells}</div>
+    body = `<div class="fgrid" style="grid-template-columns: repeat(${S.cols}, minmax(0, 1fr))">${cells}</div>
+      <div class="fboard">TAFEL / PULT</div>
       ${unplaced.length ? `<div class="fstrip">Ohne Platz: ${unplaced.map(s => `<span class="chip${isStale(s) ? " stalechip" : ""}" data-sid="${s.id}">${esc(s.name)}${isRated(s, l) ? " ✓" : isAbsent(s, l) ? " (fehlt)" : ""}</span>`).join("")}</div>` : ""}
       <div class="flegend"><span><i class="lg f0"></i>nie</span><span><i class="lg f1"></i>1–2×</span><span><i class="lg f2"></i>3–4×</span>
-        <span><i class="lg f3"></i>5–6×</span><span><i class="lg f4"></i>7×+</span><span>· Farbe = wie oft bewertet</span>
-        <span>· ✓ heute bewertet</span><span>· ⏳ seit ${thr}+ Std. nicht bewertet</span><span>· grau = fehlt</span></div>`;
+        <span><i class="lg f3"></i>5–6×</span><span><i class="lg f4"></i>7×+</span><span>· Farbe = wie oft gemeldet</span>
+        <span>· ✓ heute aktiv</span><span>· ⏳ seit ${thr}+ Std. nicht gemeldet</span><span>· grau = fehlt</span></div>`;
   } else {
     body = `<div class="fscroll">${classHtml(c, l)}</div>`;
   }
@@ -674,14 +875,59 @@ $("focus").addEventListener("click", e => {
     return;
   }
   if (t.id === "fFilter") { focusFilter = !focusFilter; render(); return; }
-  if (t.classList.contains("lv")) { handleRate(c, t); return; }
   if (t.classList.contains("absbtn")) { toggleAbsent(c, t.closest("[data-id]").dataset.id); render(); return; }
-  const p = t.closest("[data-sid]");
-  if (p) openRateDialog(c, c.students.find(s => s.id === p.dataset.sid));
+  if (t.closest(".pwrinc, .pwrdec")) { handlePower(c, t.closest(".pwrinc, .pwrdec")); return; }
+  if (t.closest(".failinc, .faildec")) { handleFail(c, t.closest(".failinc, .faildec")); return; }
+  if (t.closest(".melinc, .meldec")) { handleMeldung(c, t.closest(".melinc, .meldec")); return; }
+  if (t.closest(".ratebtn")) { openRateDialog(c, c.students.find(x => x.id === t.closest(".ratebtn").dataset.sid)); return; }
+  if (t.closest(".notebtn")) { editNote(c, t.closest(".notebtn").dataset.sid); return; }
+  // Karte (alphabetische Ersatzliste ohne Sitzplan): zeigt Tiefe/Fehlt/Power schon inline, ein einfacher Tap irgendwo sonst = Meldung.
+  const card = t.closest(".card[data-id]");
+  if (card) handleMeldung(c, card);
 });
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && focusMode && !$("dlgRate").open) { focusMode = false; render(); }
 });
+
+// Kachel (Sitzplan im Vollbild) antippen = Meldung · nach oben ziehen (ab ~40px) = Dialog für Inhaltliche Tiefe öffnen.
+// Eigener, unabhängiger Geste-Handler (andere Elementklassen als das Sitzplan-Editor-Dragging, kein Konflikt).
+let tdrag = null, dragEndedAt = 0;   // dragEndedAt wird auch vom Sitzplan-Editor-Dragging weiter unten mitgenutzt
+const TILE_DRAG_PX = 40;
+$("focus").addEventListener("pointerdown", e => {
+  if (e.button !== 0) return;
+  if (e.target.closest(".pwrinc, .pwrdec, .failinc, .faildec, .melinc, .meldec, .absbtn, .ratebtn")) return;
+  const tgt = e.target.closest(".ftile[data-sid], .chip[data-sid]");
+  if (!tgt) return;
+  tdrag = { sid: tgt.dataset.sid, el: tgt, startY: e.clientY, committed: false };
+});
+document.addEventListener("pointermove", e => {
+  if (!tdrag) return;
+  const dy = tdrag.startY - e.clientY;   // positiv = nach oben
+  if (!tdrag.committed) {
+    if (Math.abs(dy) < 8) return;
+    tdrag.committed = true;
+  }
+  e.preventDefault();
+  tdrag.el.style.transform = `translateY(${-Math.min(Math.max(dy, 0), TILE_DRAG_PX + 20)}px)`;
+});
+function endTileDrag(e, cancel) {
+  if (!tdrag) return;
+  const d = tdrag; tdrag = null;
+  d.el.style.transform = "";
+  const c = course(); if (!c) return;
+  const s = c.students.find(x => x.id === d.sid); if (!s) return;
+  if (!d.committed) {
+    // kein nennenswertes Bewegen → normaler Tap = Meldung (kein nachfolgendes click-Event nötig, hier erledigt)
+    if (!cancel) handleMeldung(c, { dataset: { sid: s.id } });
+    return;
+  }
+  dragEndedAt = Date.now();   // unterdrückt das nachfolgende synthetische click-Event (geteilter Mechanismus mit dem Sitzplan-Editor)
+  if (cancel) return;
+  const dy = d.startY - e.clientY;
+  if (dy >= TILE_DRAG_PX) openRateDialog(c, s); else handleMeldung(c, { dataset: { sid: s.id } });
+}
+document.addEventListener("pointerup", e => endTileDrag(e, false));
+document.addEventListener("pointercancel", e => endTileDrag(e, true));
 
 // Sitzplan: Raster aus Reihen × Plätzen, Tafel oben. Bearbeiten: Schüler antippen, dann Platz antippen.
 function seatInfo(c) {
@@ -695,7 +941,6 @@ function seatInfo(c) {
   const placed = new Set(Object.values(at).map(s => s.id));
   return { S, at, unplaced: c.students.filter(s => !placed.has(s.id)) };
 }
-function badge(v, label) { return typeof v === "number" ? `<span>${label} <b class="${v > 0 ? "p" : "n"}">${lvLabel(v)}</b></span>` : ""; }
 function seatHtml(c, cur) {
   const { S, at, unplaced } = seatInfo(c);
   let cells = "";
@@ -703,7 +948,7 @@ function seatHtml(c, cur) {
     const s = at[r + "-" + k];
     if (!s) { cells += `<div class="seat free editing" data-pos="${r}-${k}"></div>`; continue; }
     cells += `<div class="seat" data-pos="${r}-${k}"><div class="tile${seatPick === s.id ? " picked" : ""}" data-sid="${s.id}">
-      <div class="tn">${s.photo ? `<img class="tph" src="${s.photo}" alt="">` : ""}${esc(s.name)}</div><div class="tb"><span>${cavgHtml(c, s)}</span></div></div></div>`;
+      <div class="tn">${avatarHtml(s, "sm")}${esc(s.name)}</div><div class="tb"><span>${cavgHtml(c, s)}</span></div></div></div>`;
   }
   // Der Reiter „Sitzplan“ ist zum Einrichten da (immer direkt bearbeitbar). Bewertet wird im Unterrichtsmodus.
   return `<div class="seatbar">
@@ -715,54 +960,138 @@ function seatHtml(c, cur) {
     <p class="hint">Schüler mit Maus oder Finger auf einen Platz <b>ziehen</b> – oder Schüler antippen (blau umrandet) und dann den Platz antippen.
       Auf einen besetzten Platz = die beiden tauschen. Auf „Noch ohne Platz“ ziehen/tippen = Platz freigeben. Alles wird sofort gespeichert.
       Bewertet wird im Reiter <b>✍️ Unterricht</b>.</p>
-    <div class="board">TAFEL / PULT</div>
     <div class="seats editing" style="grid-template-columns: repeat(${S.cols}, minmax(0, 1fr))">${cells}</div>
+    <div class="board">TAFEL / PULT</div>
     <div class="unplaced" id="unplaced"><b>Noch ohne Platz (${unplaced.length})</b>
       <div class="chips">${unplaced.map(s => `<span class="chip${seatPick === s.id ? " picked" : ""}" data-sid="${s.id}">${esc(s.name)}</span>`).join("")}</div></div>`;
 }
+// Öffnet das Bewertungsfenster für eine NEUE Antwort (leere Ampel-Auswahl). Zum Aktualisieren der bereits
+// offenen Ansicht (z. B. nach Power/Meldung/Fehlt) dient fillDialog() – das setzt `pending` NICHT zurück.
 function openRateDialog(c, s) {
   const l = currentLesson(c);
   if (!l) { toast("Keine Stunde gewählt. Oben eine Stunde auswählen oder anlegen.", true); return; }
-  const d = $("dlgRate");
-  clearTimeout(autoCloseT);
-  d.dataset.id = s.id;
-  $("rateName").innerHTML = `${s.photo ? `<img src="${s.photo}" alt="">` : ""}${esc(s.name)} <small style="font-weight:400;color:var(--muted);font-size:15px">${dateLabel(l.date)}</small>`;
-  const abs = isAbsent(s, l);
-  $("rateBody").innerHTML = RATINGS.map(r => `<div class="crow"><span class="clabel">${r.key === "b" ? "Beteiligung" : "Inhaltl. Tiefe"}</span>${rateBox(s, l.id, r, true)}</div>`).join("")
-    + `<div class="crow"><span class="clabel">Anwesenheit</span><button class="absbtn${abs ? " on" : ""}">${abs ? "✓ Fehlt heute – zurücknehmen" : "Fehlt heute"}</button></div>`
-    + `<p class="hint dlgavg" style="margin-top:12px">${cavgHtml(c, s)} · ${ratedCount(c, s)}× bewertet · ${absentCount(c, s)}× gefehlt</p>
-       <p class="hint" style="margin:0">Schließt automatisch, wenn beide gewählt sind. Nur eine Kategorie: daneben tippen oder „Fertig“.</p>`;
-  d.showModal();
+  pending = {};
+  fillDialog(c, s, l);
+  $("dlgRate").showModal();
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
 }
+function fillDialog(c, s, l) {
+  const d = $("dlgRate");
+  d.dataset.id = s.id;
+  $("rateName").innerHTML = `${avatarHtml(s, "sm")}${esc(s.name)} <small style="font-weight:400;color:var(--muted);font-size:15px">${dateLabel(l.date)}</small>`;
+  const abs = isAbsent(s, l), pn = powerCount(c, s, l.id), xn = failCount(c, s, l.id), na = answersOf(s, l.id).length;
+  $("rateBody").innerHTML = `<div class="crow"><span class="clabel">Meldung</span>${melCellHtml(s, l.id, true)}</div>`
+    + `<p class="hint" style="margin:10px 0 2px">Neue Antwort bewerten – tippe an, was zutrifft (bis zu 4 Kategorien). Bereits <b>${na}</b> Antwort(en) diese Stunde.</p>`
+    + RATINGS.map(r => ampelRowHtml(r, pending[r.key])).join("")
+    + `<div class="crow"><span class="clabel">Anwesenheit</span><button class="absbtn${abs ? " on" : ""}">${abs ? "✓ Fehlt heute – zurücknehmen" : "Fehlt heute"}</button></div>`
+    + `<div class="crow"><span class="clabel">Power-Antwort</span><button class="pwrinc big${pn ? " on" : ""}" data-sid="${s.id}">⚡ Power${pn ? ` ${pn}/5` : ""}</button>${pn ? `<button class="pwrdec sm" data-sid="${s.id}" title="Letzte Power-Antwort zurücknehmen">↩ −1</button>` : ""}</div>`
+    + `<div class="crow"><span class="clabel">Fail-Antwort</span><button class="failinc big${xn ? " on" : ""}" data-sid="${s.id}">❌ Fail${xn ? ` ${xn}/5` : ""}</button>${xn ? `<button class="faildec sm" data-sid="${s.id}" title="Letzten Fail zurücknehmen">↩ −1</button>` : ""}</div>`
+    + `<p class="hint dlgavg" style="margin-top:12px">${cavgHtml(c, s)} · ${absentCount(c, s)}× gefehlt · ${powerCount(c, s)}⚡ Power · ${failCount(c, s)}❌ Fail gesamt</p>
+       <p class="hint" style="margin:0">„Fertig“ oder daneben tippen legt die Antwort fest. Nichts angetippt = keine neue Antwort.</p>`;
+}
+// Ampel-Punkt antippen: ändert nur die GERADE offene (noch nicht bestätigte) Antwort, schreibt noch nichts in die Daten.
+function handleAmpelTap(c, s, l, btn) {
+  const key = btn.closest(".ampgrp").dataset.cat, v = Number(btn.dataset.v);
+  pending[key] = pending[key] === v ? undefined : v;
+  if (pending[key] === undefined) delete pending[key];
+  fillDialog(c, s, l);
+}
+// Beim Schließen des Fensters (Fertig / daneben tippen / Esc) wird die Antwort fest eingetragen – falls mindestens
+// eine Kategorie gewählt wurde. Nichts angetippt = es passiert nichts (keine leere Antwort).
+function commitPendingAnswer() {
+  const c = course(); const d = $("dlgRate");
+  if (!c || !d.dataset.id || !Object.keys(pending).length) { pending = {}; return; }
+  const l = currentLesson(c); const s = c.students.find(x => x.id === d.dataset.id);
+  if (l && s) {
+    snapshot(undefined, true);
+    s.lr = s.lr || {}; s.lrt = s.lrt || {};
+    const r = s.lr[l.id] = s.lr[l.id] || {};
+    r.answers = r.answers || [];
+    r.answers.push({ ts: Date.now(), ...pending });
+    delete r.f;   // eine Antwort bedeutet anwesend
+    s.lrt[l.id] = Date.now();
+    save();
+  }
+  pending = {};
+}
 
-// Bewertung setzen (Ranking-Tabelle, Unterrichtsmodus und Sitzplan-Fenster nutzen dieselbe Funktion)
-function handleRate(c, t) {
+// Power-Antwort: niederschwellig antippbar, bis zu 5× pro Schüler und Stunde, kurze Reaktion (Kachel wird kurz größer).
+// Rücknahme bei Vertippen: der kleine Zähler-Knopf (⚡{n}↩ / ↩ −1) nimmt die letzte Power-Antwort zurück.
+function handlePower(c, btn) {
   const l = currentLesson(c);
   if (!l) { toast("Keine Stunde gewählt.", true); return; }
-  const holder = t.closest("[data-id]"); const s = holder && c.students.find(x => x.id === holder.dataset.id); if (!s) return;
-  const box = t.closest(".rate"), key = box.dataset.r, v = Number(t.dataset.v);
+  const dec = btn.classList.contains("pwrdec");
+  const sid = btn.dataset.sid || (btn.closest("[data-id]") || {}).dataset.id;
+  const s = c.students.find(x => x.id === sid); if (!s) return;
   snapshot(undefined, true);
   s.lr = s.lr || {}; s.lrt = s.lrt || {};
   const r = s.lr[l.id] = s.lr[l.id] || {};
-  if (r[key] === v) delete r[key]; else { r[key] = v; delete r.f; }   // Bewertung = anwesend
-  if (!Object.keys(r).length) delete s.lr[l.id];
-  const ab = holder.querySelector(".absbtn"); if (ab) { ab.classList.remove("on"); ab.textContent = "Fehlt heute"; }
-  s.lrt[l.id] = Date.now();   // Zeitstempel für das Zusammenführen PC ↔ iPad
-  box.querySelectorAll(".lv").forEach(b => b.classList.toggle("on", Number(b.dataset.v) === r[key]));
-  holder.querySelectorAll("td.ravg").forEach((cell, i) => { cell.outerHTML = ravgHtml(c, s, RATINGS[i].key); });
-  holder.querySelectorAll(".cavg, .dlgavg").forEach(el => { el.innerHTML = cavgHtml(c, s); });
-  if (holder.classList.contains("card")) holder.classList.toggle("rated", isRated(s, l));
-  const cnt = c.students.filter(x => isRated(x, l)).length;
-  const rc = $("ratedCount"); if (rc) rc.textContent = cnt;
-  const fc = document.querySelector("#focus .fcount"); if (fc) fc.textContent = `${cnt} von ${c.students.length} bewertet`;
-  save();
-  // Bewertungs-Fenster: sobald Beteiligung UND Tiefe gewählt sind, kurz zeigen und automatisch schließen
-  const d = $("dlgRate");
-  clearTimeout(autoCloseT);
-  if (d.open && holder === d && r[key] === v && RATINGS.every(x => typeof r[x.key] === "number")) {
-    autoCloseT = setTimeout(() => { if (d.open) d.close(); }, 450);
+  if (dec) {
+    if (!r.p) return;
+    r.p -= 1; if (!r.p) delete r.p;
+  } else {
+    if ((r.p || 0) >= 5) { toast("Maximal 5 Power-Antworten pro Stunde.", true); return; }
+    r.p = (r.p || 0) + 1; delete r.f;
   }
+  if (!Object.keys(r).length) delete s.lr[l.id];
+  s.lrt[l.id] = Date.now();
+  save();
+  if ($("dlgRate").open && $("dlgRate").dataset.id === s.id) fillDialog(c, s, l);
+  render();
+  if (dec) return;
+  // Kurze Reaktion erst NACH dem Neuaufbau auslösen, sonst verpufft sie am alten, gleich ersetzten Element.
+  const fresh = document.querySelector(`.ftile[data-sid="${sid}"], .card[data-id="${sid}"]`);
+  if (fresh) { fresh.classList.add("pwrpop"); setTimeout(() => fresh.classList.remove("pwrpop"), 350); }
+}
+
+// Fail-Antwort: Gegenstück zu Power, gleiches Muster (bis 5× pro Stunde, Rücknahme-Knopf).
+function handleFail(c, btn) {
+  const l = currentLesson(c);
+  if (!l) { toast("Keine Stunde gewählt.", true); return; }
+  const dec = btn.classList.contains("faildec");
+  const sid = btn.dataset.sid || (btn.closest("[data-id]") || {}).dataset.id;
+  const s = c.students.find(x => x.id === sid); if (!s) return;
+  snapshot(undefined, true);
+  s.lr = s.lr || {}; s.lrt = s.lrt || {};
+  const r = s.lr[l.id] = s.lr[l.id] || {};
+  if (dec) {
+    if (!r.x) return;
+    r.x -= 1; if (!r.x) delete r.x;
+  } else {
+    if ((r.x || 0) >= 5) { toast("Maximal 5 Fails pro Stunde.", true); return; }
+    r.x = (r.x || 0) + 1; delete r.f;
+  }
+  if (!Object.keys(r).length) delete s.lr[l.id];
+  s.lrt[l.id] = Date.now();
+  save();
+  if ($("dlgRate").open && $("dlgRate").dataset.id === s.id) fillDialog(c, s, l);
+  render();
+  if (dec) return;
+  const fresh = document.querySelector(`.ftile[data-sid="${sid}"], .card[data-id="${sid}"]`);
+  if (fresh) { fresh.classList.add("pwrpop"); setTimeout(() => fresh.classList.remove("pwrpop"), 350); }
+}
+
+// Meldung (= Beteiligung): Antippen der Kachel/Karte zählt +1, kein Limit. `.meldec` nimmt die letzte Meldung zurück.
+// `el` ist meist ein echter Button/eine Kachel; bei der Tipp-Geste auf `.ftile` wird nur `{dataset:{sid}}` übergeben.
+function handleMeldung(c, el, dir) {
+  const l = currentLesson(c);
+  if (!l) { toast("Keine Stunde gewählt.", true); return; }
+  const dec = dir === -1 || (el.classList && el.classList.contains("meldec"));
+  const sid = el.dataset.sid || (el.closest && (el.closest("[data-id]") || {}).dataset.id);
+  const s = c.students.find(x => x.id === sid); if (!s) return;
+  snapshot(undefined, true);
+  s.lr = s.lr || {}; s.lrt = s.lrt || {};
+  const r = s.lr[l.id] = s.lr[l.id] || {};
+  if (dec) { if (!r.m) return; r.m -= 1; if (!r.m) delete r.m; }
+  else { r.m = (r.m || 0) + 1; delete r.f; }
+  if (!Object.keys(r).length) delete s.lr[l.id];
+  s.lrt[l.id] = Date.now();
+  save();
+  if ($("dlgRate").open && $("dlgRate").dataset.id === s.id) fillDialog(c, s, l);
+  render();
+  if (dec) return;
+  const fresh = document.querySelector(`.ftile[data-sid="${sid}"], .card[data-id="${sid}"]`);
+  if (fresh) { fresh.classList.add("pwrpop"); setTimeout(() => fresh.classList.remove("pwrpop"), 350); }
 }
 
 function rowHtml(c, s, i, cur) {
@@ -770,13 +1099,14 @@ function rowHtml(c, s, i, cur) {
     <td class="rank">${i + 1}.</td>
     <td class="handle" title="Hier anfassen und nach oben/unten ziehen">✋</td>
     <td class="photo"><div class="ph" title="Klick: Foto wählen · Rechtsklick: Foto entfernen">${s.photo ? `<img src="${s.photo}" alt="">` : "+"}</div></td>
-    <td class="name"><input class="sname" readonly title="Doppelklick zum Umbenennen" value="${esc(s.name)}"></td>
+    <td class="name"><input class="sname" readonly title="Doppelklick zum Umbenennen" value="${esc(s.name)}">${noteBtnHtml(s)}</td>
     ${c.columns.map(col => {
       const v = s.scores[col.id];
       return `<td><input class="score ${scoreClass(v)}" data-col="${col.id}" type="number" min="0" max="15" step="1" value="${typeof v === "number" ? v : ""}"></td>`;
     }).join("")}
     <td class="avg">${fmt(avg(c, s))}</td>
-    ${cur ? RATINGS.map(r => rateCell(s, cur.id, r)).join("") : ""}
+    ${cur ? `<td class="rate">${melCellHtml(s, cur.id)}</td>` : ""}
+    <td class="ravg">${meldAvg(c, s) !== null ? fmt(meldAvg(c, s)) : "–"}</td>
     ${RATINGS.map(r => ravgHtml(c, s, r.key)).join("")}
     <td class="act"><button class="up" title="Nach oben">▲</button> <button class="down" title="Nach unten">▼</button> <button class="x del" title="Schüler löschen">✕</button></td>
   </tr>`;
@@ -856,6 +1186,10 @@ main.addEventListener("click", e => {
     let y = m[3] ? Number(m[3]) : now.getFullYear(); if (y < 100) y += 2000;
     const dt = new Date(y, Number(m[2]) - 1, Number(m[1]));
     if (dt.getMonth() !== Number(m[2]) - 1) { toast("Dieses Datum gibt es nicht.", true); return; }
+    if ((c.weekdays || []).length && !c.weekdays.includes(dt.getDay())) {
+      const tage = c.weekdays.map(d => WD[d]).join(", ");
+      if (!confirm(`${WD[dt.getDay()]} ist bei „${c.name}“ kein eingestellter Kurstag (nur ${tage}). Trotzdem anlegen?`)) return;
+    }
     const iso = localDate(dt);
     let l = c.lessons.find(x => x.date === iso);
     if (!l) {
@@ -871,6 +1205,12 @@ main.addEventListener("click", e => {
     save(); render();
   } else if (t.closest("#btnStart")) {
     startLesson(c);
+  } else if (t.closest("[data-missing]")) {
+    const btn = t.closest("[data-missing]"), iso = btn.dataset.date;
+    snapshot();
+    c.skip = (c.skip || []).filter(x => x !== iso);
+    if (btn.dataset.missing === "skip") { c.skip.push(iso); save(); render(); }
+    else { const l = { id: uid(), date: iso }; c.lessons.push(l); c.lessons.sort((a, b) => a.date.localeCompare(b.date)); lessonSel[c.id] = l.id; save(); render(); }
   } else if (t.id === "btnToday") {
     const iso = localDate();
     let l = c.lessons.find(x => x.date === iso);
@@ -878,8 +1218,14 @@ main.addEventListener("click", e => {
     lessonSel[c.id] = l.id; render();
   } else if (t.closest(".tab")) {
     seatPick = null; setView(t.closest(".tab").dataset.view);
-  } else if (t.classList.contains("lv")) {
-    handleRate(c, t);
+  } else if (t.closest(".pwrinc, .pwrdec")) {
+    handlePower(c, t.closest(".pwrinc, .pwrdec"));
+  } else if (t.closest(".failinc, .faildec")) {
+    handleFail(c, t.closest(".failinc, .faildec"));
+  } else if (t.closest(".melinc, .meldec")) {
+    handleMeldung(c, t.closest(".melinc, .meldec"));
+  } else if (t.closest(".notebtn")) {
+    editNote(c, t.closest(".notebtn").dataset.sid);
   } else if (view === "seat" && seatClick(c, t, e)) {
     // im Sitzplan erledigt
   } else if (t.id === "btnDelLesson") {
@@ -890,8 +1236,12 @@ main.addEventListener("click", e => {
     c.students.forEach(s => { if (s.lr) delete s.lr[l.id]; });
     if (l.date === localDate() && !c.skip.includes(l.date)) c.skip.push(l.date);
     lessonSel[c.id] = ""; save(); render();
+  } else if (t.id === "btnMonthOnly") {
+    monthOnly = !monthOnly; render();
   } else if (t.closest(".ovh")) {
     lessonSel[c.id] = t.closest(".ovh").dataset.lesson; setView(isTouch ? "class" : "rank");
+  } else if (t.closest("[data-sort]")) {
+    sortBy(c, t.closest("[data-sort]").dataset.sort);
   } else if (t.classList.contains("delcol")) {
     const colId = t.closest("th").dataset.col; const col = c.columns.find(x => x.id === colId);
     if (!confirm(`Spalte „${col.name}“ mit allen Punkten löschen?`)) return;
@@ -981,7 +1331,7 @@ function unplaceStudent(c, sid) {
 // Sitzplan bearbeiten: Schüler mit Maus oder Finger auf einen Platz ziehen
 // Nach einem Ziehen soll der „Klick“ beim Loslassen nichts auslösen – aber nur genau dieser,
 // nicht das nächste echte Antippen (Zeitfenster statt Merker, der hängen bleiben kann).
-let sdrag = null, dragEndedAt = 0;
+let sdrag = null;
 main.addEventListener("pointerdown", e => {
   if (view !== "seat" || e.button !== 0) return;
   const p = e.target.closest(".tile[data-sid], .chip[data-sid]"); if (!p) return;
@@ -1022,18 +1372,27 @@ document.addEventListener("click", e => {
 document.addEventListener("pointerdown", () => { dragEndedAt = 0; }, true);
 
 // Bewertungs-Fenster (Sitzplan)
+// Das Bestätigen der Antwort läuft bewusst mehrfach ab (Klick auf „Fertig“/daneben, Esc/Abbrechen, das native
+// close-Event) – commitPendingAnswer() ist dabei ungefährlich mehrfach aufrufbar (leert `pending` nach dem ersten Mal).
 $("dlgRate").addEventListener("click", e => {
   const d = $("dlgRate");
-  if (e.target === d || e.target.id === "rateClose") { d.close(); return; }
-  if (e.target.classList.contains("lv")) { const c = course(); if (c) handleRate(c, e.target); }
+  if (e.target === d || e.target.id === "rateClose") { commitPendingAnswer(); d.close(); render(); return; }
+  if (e.target.closest(".ampdot")) {
+    const c = course(); const s = c && c.students.find(x => x.id === d.dataset.id); const l = c && currentLesson(c);
+    if (c && s && l) handleAmpelTap(c, s, l, e.target.closest(".ampdot"));
+  }
+  if (e.target.closest(".pwrinc, .pwrdec")) { const c = course(); if (c) handlePower(c, e.target.closest(".pwrinc, .pwrdec")); }
+  if (e.target.closest(".failinc, .faildec")) { const c = course(); if (c) handleFail(c, e.target.closest(".failinc, .faildec")); }
+  if (e.target.closest(".melinc, .meldec")) { const c = course(); if (c) handleMeldung(c, e.target.closest(".melinc, .meldec")); }
   if (e.target.classList.contains("absbtn")) {
     const c = course(); if (!c) return;
     const now = toggleAbsent(c, d.dataset.id);
-    if (now) { d.close(); return; }                       // „Fehlt“ gesetzt → Feld schließt sofort
+    if (now) { commitPendingAnswer(); d.close(); render(); return; }   // „Fehlt“ gesetzt → Feld schließt sofort
     e.target.classList.remove("on"); e.target.textContent = "Fehlt heute";
   }
 });
-$("dlgRate").addEventListener("close", () => render());
+$("dlgRate").addEventListener("cancel", () => commitPendingAnswer());   // Esc
+$("dlgRate").addEventListener("close", () => { commitPendingAnswer(); render(); });
 
 // Name per Doppelklick bearbeiten; Enter oder Klick daneben beendet das Bearbeiten.
 main.addEventListener("dblclick", e => {
@@ -1116,23 +1475,46 @@ document.addEventListener("keydown", e => {
   }
 });
 
-function sortBy(c, key) {
+// Merkt sich das zuletzt genutzte Sortier-Kriterium: nochmal dieselbe Spalte anklicken = Richtung umdrehen.
+let lastSortKey = null, lastSortAsc = false;
+function sortBy(c, key, forceAsc) {
   if (!key) return;
   snapshot();
+  // Im Monatsrückblick (Übersicht) wird nach den dort gezeigten, gefilterten Werten sortiert.
+  const mc = (view === "overview" && monthOnly) ? { ...c, lessons: monthLessons(c) } : c;
   const val = s => {
     if (key === "avg") return avg(c, s);
-    if (key.startsWith("r:")) { const r = ratingAvg(c, s, key.slice(2)); return r ? r.a : null; }
+    if (key === "meld") return meldAvg(mc, s);
+    if (key === "power") return powerCount(mc, s);
+    if (key === "fail") return failCount(mc, s);
+    if (key === "absent") return absentCount(mc, s);
+    if (key.startsWith("r:")) { const r = catCourseAvg(mc, s, key.slice(2)); return r ? r.a : null; }
     return typeof s.scores[key] === "number" ? s.scores[key] : null;
   };
-  if (key === "name") c.students.sort((a, b) => a.name.localeCompare(b.name, "de"));
+  let asc = key === "absent";   // Vorgabe: wenigste Fehlstunden zuerst, sonst immer „am besten“ zuerst
+  if (forceAsc !== undefined) asc = forceAsc;
+  else if (key === lastSortKey) asc = !lastSortAsc;   // gleiche Spalte nochmal → Richtung umdrehen
+  lastSortKey = key; lastSortAsc = asc;
+  if (key === "name") c.students.sort((a, b) => asc ? a.name.localeCompare(b.name, "de") : b.name.localeCompare(a.name, "de"));
   else c.students.sort((a, b) => {
     const va = val(a), vb = val(b);
     if (va === null && vb === null) return 0;
     if (va === null) return 1;
     if (vb === null) return -1;
-    return vb - va;
+    return asc ? va - vb : vb - va;
   });
-  save(); render(); toast("Sortiert. Du kannst jetzt wieder frei verschieben.");
+  save(); render(); toast(`Sortiert nach „${sortLabel(key)}“ (${asc ? "aufsteigend" : "absteigend"}). Nochmal klicken dreht die Richtung um.`);
+}
+function sortArrow(key) { return key !== lastSortKey ? "↕" : lastSortAsc ? "▲" : "▼"; }
+function sortLabel(key) {
+  if (key === "avg") return "Ø Durchschnitt";
+  if (key === "meld") return "Meldungen";
+  if (key === "power") return "Power-Antworten";
+  if (key === "fail") return "Fail-Antworten";
+  if (key === "absent") return "Gefehlt";
+  if (key === "name") return "Name";
+  if (key.startsWith("r:")) { const r = RATINGS.find(x => x.key === key.slice(2)); return r ? r.name : key; }
+  return key;
 }
 
 /* ========== Ziehen zum Sortieren ========== */
@@ -1263,24 +1645,72 @@ $("filePhoto").addEventListener("change", async e => {
 });
 async function setPhoto(studentId, file) {
   const c = course(); const s = c && c.students.find(x => x.id === studentId); if (!s) return;
-  try {
-    const url = await resizeImage(file, 120);
-    snapshot(); s.photo = url; save(); render();
-  } catch (err) { toast("Bild konnte nicht gelesen werden.", true); }
+  try { await openCropDialog(file, s); } catch (err) { toast("Bild konnte nicht gelesen werden.", true); }
 }
-function resizeImage(file, size) {
+// Zuschneiden: nützlich für Gruppenfotos (z. B. 20 Schüler auf einem Foto) – man wählt per Zoom/Verschieben
+// jedes Mal denselben Rahmen, aber einen anderen Ausschnitt für jeden Schüler.
+let cropState = null;
+function openCropDialog(file, s) {
   return new Promise((resolve, reject) => {
     const img = new Image(); const u = URL.createObjectURL(file);
     img.onload = () => {
-      const cv = document.createElement("canvas"); cv.width = cv.height = size;
-      const m = Math.min(img.width, img.height);
-      cv.getContext("2d").drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, size, size);
-      URL.revokeObjectURL(u); resolve(cv.toDataURL("image/jpeg", 0.82));
+      const canvas = $("cropCanvas"), ctx = canvas.getContext("2d");
+      const base = Math.max(canvas.width / img.width, canvas.height / img.height);
+      cropState = { img, ctx, canvas, base, scale: base,
+        ox: (canvas.width - img.width * base) / 2, oy: (canvas.height - img.height * base) / 2, s };
+      $("cropZoom").value = 100;
+      cropDraw();
+      $("dlgCrop").showModal();
+      cropState.resolve = () => { URL.revokeObjectURL(u); resolve(); };
+      cropState.reject = () => { URL.revokeObjectURL(u); reject(); };
     };
     img.onerror = () => { URL.revokeObjectURL(u); reject(); };
     img.src = u;
   });
 }
+function cropDraw() {
+  const { img, ctx, canvas, ox, oy, scale } = cropState;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, ox, oy, img.width * scale, img.height * scale);
+}
+function cropClamp() {
+  const { img, canvas, scale } = cropState;
+  const w = img.width * scale, h = img.height * scale;
+  cropState.ox = Math.min(0, Math.max(canvas.width - w, cropState.ox));
+  cropState.oy = Math.min(0, Math.max(canvas.height - h, cropState.oy));
+}
+let cropDrag = null;
+$("cropCanvas").addEventListener("pointerdown", e => {
+  if (!cropState) return;
+  cropDrag = { x: e.clientX, y: e.clientY, ox: cropState.ox, oy: cropState.oy };
+  $("cropCanvas").style.cursor = "grabbing";
+});
+document.addEventListener("pointermove", e => {
+  if (!cropDrag || !cropState) return;
+  cropState.ox = cropDrag.ox + (e.clientX - cropDrag.x);
+  cropState.oy = cropDrag.oy + (e.clientY - cropDrag.y);
+  cropClamp(); cropDraw();
+});
+document.addEventListener("pointerup", () => { cropDrag = null; if (cropState) $("cropCanvas").style.cursor = "grab"; });
+$("cropZoom").addEventListener("input", e => {
+  if (!cropState) return;
+  const { canvas } = cropState, cx = canvas.width / 2, cy = canvas.height / 2;
+  const old = cropState.scale, f = cropState.base * (Number(e.target.value) / 100);
+  // Zoom-Mittelpunkt bleibt die Canvas-Mitte, nicht die linke obere Ecke.
+  cropState.ox = cx - (cx - cropState.ox) * (f / old);
+  cropState.oy = cy - (cy - cropState.oy) * (f / old);
+  cropState.scale = f;
+  cropClamp(); cropDraw();
+});
+$("cropCancel").onclick = () => { $("dlgCrop").close(); if (cropState) cropState.reject(); cropState = null; };
+$("cropOk").onclick = () => {
+  const { img, ox, oy, scale, s, canvas } = cropState;
+  const out = document.createElement("canvas"); out.width = out.height = 120;
+  const f = 120 / canvas.width;
+  out.getContext("2d").drawImage(img, ox * f, oy * f, img.width * scale * f, img.height * scale * f);
+  snapshot(); s.photo = out.toDataURL("image/jpeg", 0.85); save(); render();
+  $("dlgCrop").close(); cropState.resolve(); cropState = null;
+};
 
 /* ========== Import von Namen ========== */
 async function importFile(file) {
@@ -1454,11 +1884,12 @@ function csvCell(v) {
 }
 function exportCsv(c) {
   ensureLessons(c);
-  const rows = [["Rang", "Name", ...c.columns.map(x => x.name), "Durchschnitt",
-    ...RATINGS.flatMap(r => ["Ø " + r.name + " (-3 bis +3)", "Anzahl " + r.name]), "Stunden bewertet", "Gefehlt"]];
+  const rows = [["Rang", "Name", ...c.columns.map(x => x.name), "Durchschnitt", "Meldungen gesamt", "Ø Meldungen pro Stunde",
+    ...RATINGS.flatMap(r => ["Ø " + r.name + " (-2 bis +2)", "Stunden mit " + r.name]), "Gefehlt", "Power gesamt", "Fail gesamt"]];
   c.students.forEach((s, i) => rows.push([i + 1, s.name, ...c.columns.map(col => s.scores[col.id] ?? ""), fmt(avg(c, s)),
-    ...RATINGS.flatMap(r => { const a = ratingAvg(c, s, r.key); return a ? [fmt(a.a), a.n] : ["", 0]; }),
-    ratedCount(c, s), absentCount(c, s)]));
+    ratedCount(c, s), meldAvg(c, s) !== null ? fmt(meldAvg(c, s)) : "",
+    ...RATINGS.flatMap(r => { const a = catCourseAvg(c, s, r.key); return a ? [fmt(a.a), a.n] : ["", 0]; }),
+    absentCount(c, s), powerCount(c, s), failCount(c, s)]));
   shareOrDownload("﻿" + rows.map(r => r.map(csvCell).join(";")).join("\r\n"), `${c.name}_${today()}.csv`, "text/csv");
 }
 
@@ -1650,11 +2081,25 @@ async function syncNow() {
     }
     lastFileMod = (await fh.getFile()).lastModified;
     lastSyncAt = new Date();
+    monthlyBackupCheck();
     if (changed) safeRender(); else renderSync();
   } catch (e) {
     syncActive = false; syncNeedsClick = true; renderSync();
     toast("Sync unterbrochen – links auf „Sync aktivieren“ klicken.", true);
   } finally { syncBusy = false; }
+}
+// Einmal pro Kalendermonat zusätzlich eine Sicherung in Unterordner „Backup" ablegen (nur PC mit Ordner-Sync,
+// damit bei einer fehlerhaften/überschriebenen Ranking-Sync.json noch ein älterer Stand existiert).
+async function monthlyBackupCheck() {
+  if (!syncActive || !syncDir) return;
+  const ym = new Date().toISOString().slice(0, 7);
+  if (state.lastMonthlyBackup === ym) return;
+  try {
+    const dir = await syncDir.getDirectoryHandle("Backup", { create: true });
+    const fh = await dir.getFileHandle(`Ranking-Backup_${ym}.json`, { create: true });
+    const w = await fh.createWritable(); await w.write(syncPayload()); await w.close();
+    state.lastMonthlyBackup = ym; saveNow();
+  } catch (e) { /* beim nächsten Sync erneut versuchen */ }
 }
 function scheduleSync() { if (!syncActive) return; clearTimeout(syncT); syncT = setTimeout(syncNow, 1500); }
 setInterval(() => { if (syncActive && !document.hidden) syncNow(); }, 60000);
